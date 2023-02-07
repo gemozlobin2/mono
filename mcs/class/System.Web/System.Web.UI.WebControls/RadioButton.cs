@@ -113,14 +113,25 @@ namespace System.Web.UI.WebControls {
 		protected override
 		bool LoadPostData (string postDataKey, NameValueCollection postCollection) 
 		{
-			string value = postCollection [NameAttribute];
-			bool checkedOnClient = value == ValueAttribute;
-			ValidateEvent (NameAttribute, value);
-			if (Checked == checkedOnClient)
-				return false;
+			string value = postCollection[NameAttribute];
+			bool valueChanged = false;
+			if ((value != null) && value.Equals(ValueAttribute)) {
+				//Validate event only if radiobutton group field there is in post data
+				ValidateEvent(NameAttribute, value);
 
-			Checked = checkedOnClient;
-			return checkedOnClient;			
+				if (Checked == false) {
+					Checked = true;
+					// only fire change event for RadioButton that is being checked
+					valueChanged = true;
+				}
+			}
+			else {
+				if (Checked == true) {
+					Checked = false;
+				}
+			}
+
+			return valueChanged;	
 		}
 
 		protected override void RaisePostDataChangedEvent ()
